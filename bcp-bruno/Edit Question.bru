@@ -1,0 +1,19 @@
+meta {
+  name: Edit Question
+  type: http
+  seq: 1
+}
+
+put {
+  url: {{baseURL}}/5
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "question": "n Q5",
+    "answer": "n A5",
+    "keywords": ["game"]
+  }
+}
