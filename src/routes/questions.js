@@ -82,6 +82,35 @@ router.get("/", async (req, res) => {
   });
 });
 
+// GET /api/questions/quiz
+// Generate a quiz with up to 10 random questions
+router.get("/quiz", async (req, res) => {
+  const allQuestions = await prisma.questions.findMany({
+    select: { id: true },
+  });
+
+  const shuffledIds = allQuestions
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 10)
+    .map((q) => q.id);
+
+  const randomQuestions = await prisma.questions.findMany({
+    where: {
+      id: { in: shuffledIds },
+    },
+    include: {
+      keywords: true,
+      user: true,
+      plays: {
+        where: { userId: req.user.userId },
+        select: { isCorrect: true },
+      },
+    },
+  });
+
+  res.json(randomQuestions.map(formatQuestion));
+});
+
 // GET /api/questions/:questionId
 // Show a specific question
 router.get("/:questionId", async (req, res) => {

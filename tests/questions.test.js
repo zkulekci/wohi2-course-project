@@ -148,4 +148,49 @@ describe("questions tests", () => {
     expect(wrongRes.status).toBe(201);
     expect(wrongRes.body.correct).toBe(false);
   });
+
+  it("generates a quiz with exactly 10 questions when there are more than 10", async () => {
+    const token = await registerAndLogin("quiz_max@test.io", "Quizzer Max");
+
+    for (let i = 1; i <= 15; i++) {
+      await createQuestions(token, {
+        question: `MaxQ${i}`,
+        answer: `MaxA${i}`,
+      });
+    }
+
+    const res = await request(app)
+      .get("/api/questions/quiz")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.length).toBe(10);
+  });
+
+  it("returns all available questions if there are fewer than 10 (including 0)", async () => {
+    const token = await registerAndLogin("quiz_min@test.io", "Quizzer Min");
+
+    const resEmpty = await request(app)
+      .get("/api/questions/quiz")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(resEmpty.status).toBe(200);
+    expect(Array.isArray(resEmpty.body)).toBe(true);
+    expect(resEmpty.body.length).toBe(0);
+
+    for (let i = 1; i <= 4; i++) {
+      await createQuestions(token, {
+        question: `MinQ${i}`,
+        answer: `MinA${i}`,
+      });
+    }
+
+    const resFew = await request(app)
+      .get("/api/questions/quiz")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(resFew.status).toBe(200);
+    expect(resFew.body.length).toBe(4);
+  });
 });
