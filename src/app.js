@@ -6,6 +6,7 @@ const logger = require("./lib/logger");
 const postsRouter = require("./routes/questions");
 const authRouter = require("./routes/auth");
 const leaderboardRouter = require("./routes/leaderboard");
+const exportRouter = require("./routes/export");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -20,6 +21,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 app.use("/api/auth", authRouter);
 app.use("/api/questions", postsRouter);
 app.use("/api/leaderboard", leaderboardRouter);
+app.use("/api/export", exportRouter);
 app.use((req, res) => res.status(404).json({ message: "Not found" }));
 app.use(errorHandler);
 
